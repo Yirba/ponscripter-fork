@@ -1248,12 +1248,8 @@ int PonscripterLabel::eventLoop()
               case SDL_WINDOWEVENT_FOCUS_LOST:
                 break;
               case SDL_WINDOWEVENT_EXPOSED:
-
-                SDL_UpdateTexture(screen_tex, NULL, accumulation_surface->pixels, accumulation_surface->pitch);
-                SDL_RenderClear(renderer);
-                SDL_RenderCopy(renderer, screen_tex, NULL, NULL);
-                SDL_RenderPresent(renderer);
-                SDL_RenderPresent(renderer);
+                //TODO verify this works
+                SDL_UpdateWindowSurface(screen);
             }
             break;
 

@@ -1485,7 +1485,6 @@ int PonscripterLabel::mpegplayCommand(const pstring& cmd)
     SubtitleDefs subtitles;
     if (script_h.hasMoreArgs()) {
         subtitles = parseSubtitles(script_h.readStrValue());
-        fprintf(stderr, "mpegplay command does not support subtitles yet\n");
     }
     stopBGM(false);
     if (playMPEG(name, cancel, subtitles))
@@ -3177,7 +3176,6 @@ int PonscripterLabel::brCommand(const pstring& cmd)
 
 int PonscripterLabel::bltCommand(const pstring& cmd)
 {
-  fprintf(stderr, "bltCommand used, but not updated to SDL2 properly\n");
     int dx, dy, dw, dh;
     int sx, sy, sw, sh;
 
@@ -3199,12 +3197,7 @@ int PonscripterLabel::bltCommand(const pstring& cmd)
         SDL_Rect dst_rect = { dx, dy, dw, dh };
 
         SDL_BlitSurface(btndef_info.image_surface, &src_rect, screen_surface, &dst_rect);
-        //TODO, fix this. haven't found it used yet
-        //SDL_UpdateRect(screen_surface, dst_rect.x, dst_rect.y, dst_rect.w, dst_rect.h);
-        SDL_UpdateTexture(screen_tex, NULL, screen_surface->pixels, screen_surface->pitch);
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, screen_tex, NULL, NULL);
-        SDL_RenderPresent(renderer);
+        SDL_UpdateWindowSurfaceRects(screen, &dst_rect, 1);
         dirty_rect.clear();
     }
     else {
@@ -3259,12 +3252,11 @@ int PonscripterLabel::bltCommand(const pstring& cmd)
         SDL_UnlockSurface(accumulation_surface);
 
         SDL_Rect dst_rect = { start_x, start_y, end_x - start_x, end_y - start_y };
-        flushDirect(dst_rect, REFRESH_NONE_MODE);
+        flushDirect((SDL_Rect &)dst_rect, REFRESH_NONE_MODE);
     }
 
     return RET_CONTINUE;
 }
-
 
 int PonscripterLabel::bidirectCommand(const pstring& cmd)
 {
