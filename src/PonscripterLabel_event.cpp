@@ -29,15 +29,7 @@
 #include <sys/wait.h>
 #endif
 
-#define ONS_TIMER_EVENT (SDL_USEREVENT)
-#define ONS_SOUND_EVENT (SDL_USEREVENT + 1)
-#define ONS_CDAUDIO_EVENT (SDL_USEREVENT + 2)
-#define ONS_MIDI_EVENT (SDL_USEREVENT + 3)
-#define ONS_WAVE_EVENT (SDL_USEREVENT + 4)
-#define ONS_MUSIC_EVENT (SDL_USEREVENT + 5)
-
-// This sets up the fadeout event flag for use in mp3 fadeout.  Recommend for integration.  [Seung Park, 20060621]
-#define ONS_FADE_EVENT (SDL_USEREVENT + 6)
+#include "PonscripterUserEvents.h"
 
 #define EDIT_MODE_PREFIX "[EDIT MODE]  "
 #define EDIT_SELECT_STRING "MP3 vol (m)  SE vol (s)  Voice vol (v)  Numeric variable (n)"
@@ -91,7 +83,6 @@ extern "C" Uint32 SDLCALL timerCallback(Uint32 interval, void* param)
 
     return interval;
 }
-
 
 extern "C" Uint32 cdaudioCallback(Uint32 interval, void* param)
 {
@@ -1158,6 +1149,10 @@ int PonscripterLabel::eventLoop()
 {
     SDL_Event event, tmp_event;
 
+    SDL_Event redraw_event;
+    redraw_event.type = INTERNAL_REDRAW_EVENT;
+    SDL_PushEvent(&redraw_event);
+
     advancePhase();
 
     while (SDL_WaitEvent(&event)) {
@@ -1241,6 +1236,13 @@ int PonscripterLabel::eventLoop()
         case ONS_MIDI_EVENT:
         case ONS_MUSIC_EVENT:
             flushEventSub(event);
+            break;
+
+        case INTERNAL_REDRAW_EVENT:
+            rerender();
+            SDL_Event event;
+            event.type = INTERNAL_REDRAW_EVENT;
+            SDL_PushEvent(&event);
             break;
 
         case ONS_WAVE_EVENT:
